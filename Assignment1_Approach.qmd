@@ -1,0 +1,18 @@
+---
+title: "Malaria_cases"
+author: "Mei Qi Ng"
+format: html
+editor: visual
+---
+
+## Approach
+
+For this assignment, I am using the Malaria dataset derived from the csv files downloaded from Kaggle. This data set provides information about the estimated number of malaria cases across the world.
+
+Dataset Source: https://raw.githubusercontent.com/meiqing39/DATA-607/refs/heads/main/Malaria_estimated_numbers.csv
+
+```{r}
+
+```
+
+
