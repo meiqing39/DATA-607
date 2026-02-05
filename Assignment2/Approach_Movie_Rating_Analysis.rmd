@@ -1,0 +1,26 @@
+---
+title: "Movie Ratings Analysis"
+author: "Mei Qi Ng"
+date: "2026-02-05"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Approach
+
+I've selected six horror/thriller movies I've watched before in theater and thought were great. Several titles here have won awards and other had mixed reviews with diverse opionions among critics. However, I am interested in what a small group of randomly selected movie fan fanatics would say about these films. Hence, I surveyed 5 friends with diverse film tastes to rate these movies on a scale of 1 to 5. I want to store these rating in a database where I can analyze and find out what is the most popular movie among this group. 
+
+My strategy moving forward would be to create a simple database strucutre that is normalized. In order to show the relational database connections, I will create 3 separate tables titled "ratings, "movies", and "critics"
+
+The challenge here will be the existence of missing data and not every participant will have seen every movie. I plan on using NA or NULL is subsitute the blanks using PostgreSQL and R to calcuate the average rating. 
+
+```{r}
+
+```
+
+
+
+
