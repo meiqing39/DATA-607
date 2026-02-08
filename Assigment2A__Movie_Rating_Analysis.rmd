@@ -1,0 +1,112 @@
+---
+title: "Movie Ratings Analysis"
+author: "Mei Qi Ng"
+date: "2026-02-05"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Approach
+
+I've selected six horror/thriller movies I've watched before in theater and thought were great. Several titles here have won awards and other had mixed reviews with diverse opinions among critics. However, I am interested in what a small group of randomly selected movie fan fanatics would say about these films. 
+
+Hence, I surveyed 5 friends with diverse film tastes to rate these movies on a scale of 1 to 5. The movies are The Substance, Nosferatu, Frankenstein, 28 years later, Sinner, and The Conjuring: Last Rites. I want to store these rating in a database where I can analyze and determine which movie is the most popular among this group.
+
+Strategy Proposal: Moving forward, my plan is to create a simple database structure that is normalized. In order to show the relational database connections, I will create 3 separate tables titled "ratings, "movies", and "reviewers".
+
+The challenge here will be the existence of missing data and not every participant will have seen every movie.  Utilizing information from R for Data Science 2nd edition book, the argument, na.rm = TRUE,and SQL NULL values in the ratings table would help verify and counter the existence of the missing data and avoid bias. 
+
+Source References- 
+(1)Gemini Pro
+(2) <https://happygitwithr.com/push-pull-github>
+(3) https://www.w3schools.com/sql/sql_alias.asp
+(3) R for Data Science 2nd edition by Grolemund
+
+I used R for data science 2nd edition book for R functions /arguments and W3schools for  SQL statements to fulfill the deliverable of this assignment. I also had several interactions with Gemini Pro LLM to: 
+(1) How to structure PostgreSQL statements required for creating multiple table with relational database connections 
+(2) Create DROP statement to allowing for reset tables for anyone to run the SQL script when opened
+(3) A solution to replace local database password with a placeholder password to access the tables made in PostgreSQL
+
+
+## Reproducibility Database Setup
+To reproduce this analysis, user uses PostgreSQL to create a database named 'DATA 607'. The SQL script included in the GitHub repository
+(`Assignment2A_movie_ratings.sql`) will create the required tables and insert sample data. 
+
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+#install.packages("DBI")
+#install.packages("RPostgres")
+
+library(DBI)
+library(RPostgres)
+library(tidyverse)
+
+# Password request, but user can set their own environment variable
+db_password <- Sys.getenv("PGPASSWORD")
+
+if (db_password == "") {
+  db_password <- rstudioapi::askForPassword("Enter your PostgreSQL password")
+}
+
+```
+
+
+
+
+# Connecting to database named "DATA 607"
+
+Loading data: I am connecting to the PostgreSQL database pgadmin. The SQL script created on there with the multiple tables is available in my Github repository using git according to instruction on Happygitwithr for uploading. 
+```{r}
+link <- dbConnect(RPostgres::Postgres(), 
+                 dbname = "DATA 607",
+                 host = "localhost", 
+                 port = 5432, 
+                 user = "postgres", 
+                 password = db_password)
+        
+```
+
+# SQL Query to merge the normalized tables
+
+```{r}
+query <- "
+SELECT r.name, m.title, rt.rating 
+FROM ratings rt
+JOIN movies m ON rt.movie_id = m.movie_id
+JOIN reviewers r ON rt.reviewer_id = r.reviewer_id;"
+
+raw_data <- dbGetQuery(link, query)
+
+```
+
+# Display the beginning few rows to verify created PostgreSQL table
+
+```{r}
+head(raw_data)
+```
+
+# Calculation of average rating to determine the favorite movie based on this group
+```{r}
+rating_conclusion <- raw_data |> 
+  group_by(title) |> 
+  summarise (average_rating = mean(rating, na.rm=TRUE),
+  review_amount= n()) |> 
+  arrange(desc(average_rating))
+
+view(rating_conclusion)
+```
+# Create a bar graph of this average movie ratings and compare visually
+```{r}
+ggplot(rating_conclusion, aes(x= average_rating, y=title))+ geom_col(fill="blue");
+```
+
+## Conclusion 
+
+A randomized selected group of people without different taste and interests were surveyed for this study. This small survey reveals the group's favorite films based on average ratings. Based on the combined table and bar chart, the group’s preferences is clear. 
+The Substance and Nosferatu emerge as the highest‑rated films, each receiving consistently strong scores from multiple reviewers. Movies like Frankenstein and 28 Years Later show more mixed reactions, while The Conjuring: Last Rites receives the lowest overall rating due to strong negative opinions from at least one participant.
+Overall, the visualization highlights how individual taste shaped the results. Some reviewers rated highly across the board, while others were more selective, yet the pattern still points to a clear set of favorites within this small sample.
+
+
