@@ -1,0 +1,85 @@
+---
+title: "Movie Ratings Analysis"
+author: "Mei Qi Ng"
+date: "2026-02-05"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Approach
+
+I've selected six horror/thriller movies I've watched before in theater and thought were great. Several titles here have won awards and other had mixed reviews with diverse opinions among critics. However, I am interested in what a small group of randomly selected movie fan fanatics would say about these films. Hence, I surveyed 5 friends with diverse film tastes to rate these movies on a scale of 1 to 5. The movies are The Sustance, Nosferatu, Frankenstein, 28 years later, Sinner, and The Conjuring 4. I want to store these rating in a database where I can analyze and find out what is the most popular movie among this group.
+
+My strategy moving forward would be to create a simple database structure that is normalized. In order to show the relational database connections, I will create 3 separate tables titled "ratings, "movies", and "reviewers".
+
+The challenge here will be the existence of missing data and not every participant will have seen every movie.  My plan for the missing data is to use R's na.rm=TRUE function and NOT NULL OR NULL  for PostgreSQL. This way it would stop the lowering of rating of the movies that weren't watched by the majority. 
+Source - (1)Gemini Pro\
+(2) <https://happygitwithr.com/push-pull-github>\
+(3) R for Data Science 2nd edition by Grolemund
+
+I used R for data science 2nd edition book for the codes to fullfill deliverables I also when through several interactions with Gemini Pro LLM to: (1) Collect PostgreSQL statment required for creating multiple table with relational database connections (2) Create DROP statement to allowing for reset tables for anyone to run the SQL script
+
+#Loading data I am connecting to the PostgreSQL database pgadmin. The SQL script created on there with the multiple tables is available in my Github repository using git according to instruction on Happygitwithr for uploading. 
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+#install.packages("DBI")
+#install.packages("RPostgres")
+
+library(DBI)
+library(RPostgres)
+library(tidyverse)
+
+db_password <- rstudioapi::askForPassword("Enter your database password")
+
+```
+
+# Connecting to database named "DATA 607"
+
+```{r}
+link <- dbConnect(RPostgres::Postgres(), 
+                 dbname = "DATA 607",
+                 host = "localhost", 
+                 port = 5432, 
+                 user = "postgres", 
+                 password = db_password)
+        
+```
+
+# SQL Query to merge the normalized tables
+
+```{r}
+query <- "
+SELECT r.name, m.title, rt.rating 
+FROM ratings rt
+JOIN movies m ON rt.movie_id = m.movie_id
+JOIN reviewers r ON rt.reviewer_id = r.reviewer_id;"
+
+raw_data <- dbGetQuery(link, query)
+
+```
+
+# Display the beginning few rows to verify created PostgreSQL table
+
+```{r}
+head(raw_data)
+```
+
+# Calculation of average rating to determine the favorite movie based on this group
+```{r}
+rating_conclusion <- raw_data |> 
+  group_by(title) |> 
+  summarise (average_rating = mean(rating, na.rm=TRUE),
+  review_amount= n()) |> 
+  arrange(desc(average_rating))
+
+view(rating_conclusion)
+```
+# Create a bar graph of this average movie ratings and compare visually
+```{r}
+ggplot(rating_conclusion, aes(x= average_rating, y=title))+ geom_col(fill="blue");
+```
+
+
