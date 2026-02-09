@@ -1,0 +1,217 @@
+---
+title: "Assignment_2B"
+author: "Mei Qi Ng"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+In this assignment, the binary classification model will be used on the penguin prediction data in a csv file and analyzed the results. The goal is to evaluate how the probablity threshhold affects the model evaluation metrics according to the model predictions. By using the Confusion Matrix (TP,FP,TN,FN) we can derive the performance metrics (Accuracy, Precision, Recall, F1 score) and create a table with the results with the calculated data. Focus: To understand Machine learning basics, Null Error Rate, Confusion Matrix, and Threshhold Tradeoffs.
+
+## Approach
+
+(1) Exploring the Data. I will load the tidyverse package and csv file, after I will find out the number of female vs male penguin and calculate the majority penguin based on the table. From there using the majority number, I will calculating the Null Error Rate. In order to check the imbalance fo the classes more clearly, ggplot2 package will be used to create a bar graph for data visualization
+
+(2) Confusion matrices at Multiple Thresholds. There are 3 different probability thresholds to test: 0.2, 0.5, and 0.8. Computation of TP, FP, TN, and FN will be done for each thresholds. Using these values, confusion matrix table is created to display these results.
+
+(3) Performance Metrics. TP, FP, TN, and FN results for each threshold (0.2,0.5, 0.8) will be used to calculate Average, Precision, Recall, F1 score while assigning letters to threshold and matrix in order to make computation clear. A table will be created to display the Performance metrics with their corresponding threshold
+
+(4) I will describe real world scenarios in which either when 0.2 and 0.8 thresholds are preferred and the use cases
+
+## Step 1: Data Exploration
+
+```{r cars}
+# Load packages and csv file
+library(tidyverse)
+
+df<- read_csv("https://raw.githubusercontent.com/meiqing39/DATA-607/refs/heads/main/Assignment2/penguin_predictions.csv", show_col_types = FALSE)
+
+#View first few rows of penguin predictions data table
+head(df)
+```
+
+In this case male is the majority and female is the minority
+
+```{r}
+#Comparing sex counts
+counts <- df |> 
+    count(sex)
+print(counts)
+
+#Calculating Majority Count
+
+majority_class <- max(counts$n)/sum(counts$n)
+
+print(majority_class)
+```
+
+```{r}
+#Calculating null_error_rate
+
+null_error_rate <- 1 - majority_class 
+
+print(null_error_rate)
+```
+
+Plot Class Distribution
+
+```{r pressure, echo=FALSE}
+ggplot(df, aes( x = sex, color = sex))+geom_bar()+ geom_text(stat="count", aes(label=after_stat(count)), vjust=-0.5)+
+         labs(title = "Class Distribution of Sex", 
+              subtitle = "Class Imbalance Check", 
+              x = "Class",
+              y = "Count")
+```
+
+## Step 2: Confusion matrices at Multiple Thresholds
+
+```{r}
+#Threshold 0.2 
+
+Thresh <- 0.2
+
+# Recomputes predicted class
+penguin02 <- df |> 
+  mutate(pred_class_thresh = ifelse(.pred_female > Thresh, 1, 0),
+         actual_class = ifelse(sex == "female", 1, 0))
+
+#Performance Metrics for Threshold 0.2
+
+TP <- sum(penguin02$pred_class_thresh == 1 & penguin02$actual_class == 1)
+FP <- sum(penguin02$pred_class_thresh == 1 & penguin02$actual_class == 0)
+TN <- sum(penguin02$pred_class_thresh == 0 & penguin02$actual_class == 0)
+FN <- sum(penguin02$pred_class_thresh == 0 & penguin02$actual_class == 1)
+```
+
+Penguin_0.2 Confusion Matrix
+
+```{r}
+
+
+conf_matrix_0.2 <- matrix(c(TP, FP, FN, TN), nrow = 2, byrow = TRUE,
+                          dimnames = list("Predicted" = c("Female", "Male"),
+                                          "Actual" = c("Female", "Male")))
+
+print (conf_matrix_0.2)
+
+```
+
+# Repeating for 0.5 and 0.8
+
+```{r}
+#Threshold 0.5 
+
+Thresh <- 0.5
+
+# Recomputes predicted class
+penguin05 <- df |> 
+  mutate(pred_class_thresh = ifelse(.pred_female > Thresh, 1, 0),
+         actual_class = ifelse(sex == "female", 1, 0))
+
+#Performance Metrics for Threshold 0.5
+
+TP <- sum(penguin05$pred_class_thresh == 1 & penguin05$actual_class == 1)
+FP <- sum(penguin05$pred_class_thresh == 1 & penguin05$actual_class == 0)
+TN <- sum(penguin05$pred_class_thresh == 0 & penguin05$actual_class == 0)
+FN <- sum(penguin05$pred_class_thresh == 0 & penguin05$actual_class == 1)
+```
+
+Penguin_0.5 Confusion Matrix
+
+```{r}
+
+
+conf_matrix_0.5 <- matrix(c(TP, FP, FN, TN), nrow = 2, byrow = TRUE,
+                          dimnames = list("Predicted" = c("Female", "Male"),
+                                          "Actual" = c("Female", "Male")))
+
+print (conf_matrix_0.5)
+
+```
+
+```{r}
+#Threshold 0.8 
+
+Thresh <- 0.8
+
+# Recomputes predicted class
+penguin08 <- df |> 
+  mutate(pred_class_thresh = ifelse(.pred_female > Thresh, 1, 0),
+         actual_class = ifelse(sex == "female", 1, 0))
+
+#Performance Metrics for Threshold 0.8
+
+TP <- sum(penguin08$pred_class_thresh == 1 & penguin08$actual_class == 1)
+FP <- sum(penguin08$pred_class_thresh == 1 & penguin08$actual_class == 0)
+TN <- sum(penguin08$pred_class_thresh == 0 & penguin08$actual_class == 0)
+FN <- sum(penguin08$pred_class_thresh == 0 & penguin08$actual_class == 1)
+```
+
+Penguin_0.8 Confusion Matrix
+
+```{r}
+
+
+conf_matrix_0.8 <- matrix(c(TP, FP, FN, TN), nrow = 2, byrow = TRUE,
+                          dimnames = list("Predicted" = c("Female", "Male"),
+                                          "Actual" = c("Female", "Male")))
+
+print (conf_matrix_0.8)
+
+```
+
+## Step 3: Performance Metrics:
+
+```{r}
+# Function to extract metrics using Sex Female/Male
+get_metrics <- function(m, t) {
+  
+# Assign, structure is matrix with "RowName", "ColName". In addition, Row = Predicted, Col = Actual
+  TP <- m["Female","Female"]
+  FP <- m["Female","Male"]
+  FN <- m["Male","Female"]
+  TN <- m["Male","Male"]
+  
+  # Calculate Total
+  total <- sum(m)
+  
+  # Calculate Metrics
+  accuracy  <- (TP + TN) / total
+  precision <- TP / (TP + FP)
+  recall    <- TP / (TP + FN)
+  F1        <- 2 * (precision * recall) / (precision + recall)
+  
+  # Return a row for the table
+  return(data.frame(
+    Threshold = t,
+    Accuracy  = round(accuracy, 3),
+    Precision = round(precision, 3),
+    Recall    = round(recall, 3),
+    F1_Score  = round(F1, 3)
+  ))
+}
+
+# Apply the function to your existing matrices
+m1 <- get_metrics(conf_matrix_0.2, 0.2)
+m2 <- get_metrics(conf_matrix_0.5, 0.5)
+m3 <- get_metrics(conf_matrix_0.8, 0.8)
+
+# Combine and Print
+metrics_summary <- rbind(m1, m2, m3)
+print(metrics_summary)
+```
+
+## Real World Threshold Use Cases
+
+Threshold 0.2 example: Disease Diagnosis
+
+In the medical field, it is important to detect disease in patient, particularly something like cancer. If the model predict a FALSE NEGATIVE; patient is healthy but actually have cancer, there would be a life threatening consequence. If the threshold is at 0.2, model will catch as many positive cases. If there was even a slight probability of cancer for anyone, that person would be flagged by this model. Unfortunately, this would mean more healthy people would be flagged (FALSE POSITIVE) for addition check up, but further testing of more patients to avoid possibilities of missing cancer treatment, make this model preferable.
+
+Threshold 0.8 example: Drug Administration
+
+In the case of receiving something like chemotherapy for cancer, FALSE POSITIVE results on a patient that is healthy would be extremely dangerous. A model where the threshold is higher such as 0.8 would be preferred 80. There would be a few cases where there will be people that will be missed (FALSE NEGATIVES) but this ensures no one healthy will be given this treatment and precision is necessary.
