@@ -23,7 +23,7 @@ Source References-
 (1)Gemini Pro
 (2) <https://happygitwithr.com/push-pull-github>
 (3) https://www.w3schools.com/sql/sql_alias.asp
-(3) R for Data Science 2nd edition by Grolemund
+(4) R for Data Science 2nd edition by Grolemund
 
 I used R for data science 2nd edition book for R functions /arguments and W3schools for  SQL statements to fulfill the deliverable of this assignment. I also had several interactions with Gemini Pro LLM to: 
 (1) How to structure PostgreSQL statements required for creating multiple table with relational database connections 
@@ -108,5 +108,6 @@ ggplot(rating_conclusion, aes(x= average_rating, y=title))+ geom_col(fill="blue"
 A randomized selected group of people without different taste and interests were surveyed for this study. This small survey reveals the group's favorite films based on average ratings. Based on the combined table and bar chart, the group’s preferences is clear. 
 The Substance and Nosferatu emerge as the highest‑rated films, each receiving consistently strong scores from multiple reviewers. Movies like Frankenstein and 28 Years Later show more mixed reactions, while The Conjuring: Last Rites receives the lowest overall rating due to strong negative opinions from at least one participant.
 Overall, the visualization highlights how individual taste shaped the results. Some reviewers rated highly across the board, while others were more selective, yet the pattern still points to a clear set of favorites within this small sample.
+
 
 
