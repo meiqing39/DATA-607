@@ -1,0 +1,40 @@
+---
+title: "Assignment_3A Approach"
+author: "Mei Qi Ng"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Approach
+The Goal of this assignment is to use a Global Baseline Estimate (GBE) recommendation system using R and see how personalization changes results in predictions. With the movie rating data collected in the previous assignment (Assignment_2A_Movie ratings), I aim to predict rating values for movies that reviewers have not yet seen. This is possible with the GBE formula. The dataset has missing values (NA/NULL) and these will be the target for our prediction algorithm. This model will account for reviewers movie bias preferences and popularity towards the item bias. 
+
+Dataset contains ratings of 6 reviewers (Liz, Jed, Brenda, Jamie, Justice, Theresa) and 6 horror/thriller movies(The Substance, Nosferatu, Frankenstein, 28 years later, Sinners, The Conjuring 4) 
+
+Source: Dataset from local PostgreSQL populated via Assigment2A_movie_rating.sql
+
+
+# Implementation Steps 
+
+(1) Connecting/Loading Data
+
+        PostgreSQL database connection with DBI and RPostgres, import raw ratings table into R data frame, and convert NULL 
+        values in SQL into NA values in R for calculation
+
+(2) Bias Calculation and apply GBE forumla
+     With dyplyr, use Group_by function and calculate: 
+      - Mean of all rating 
+      - Group: title --> movies bias
+      - Group: reviewer_name --> User bias 
+    GBE formula for User+movie pair 
+(3) Comparison and Data Visualization
+
+       Raw average vs GBE average predictions and seeing the user bias distribution. Find the predicted score for a reviewer, in this       case,   I will use Liz as an example. 
+
+```{r}
+
+```
+
