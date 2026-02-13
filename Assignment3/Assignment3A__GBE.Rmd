@@ -9,32 +9,112 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Approach
-The Goal of this assignment is to use a Global Baseline Estimate (GBE) recommendation system using R and see how personalization changes results in predictions. With the movie rating data collected in the previous assignment (Assignment_2A_Movie ratings), I aim to predict rating values for movies that reviewers have not yet seen. This is possible with the GBE formula. The dataset has missing values (NA/NULL) and these will be the target for our prediction algorithm. This model will account for reviewers movie bias preferences and popularity towards the item bias. 
+## [Approach]{.underline}
 
-Dataset contains ratings of 6 reviewers (Liz, Jed, Brenda, Jamie, Justice, Theresa) and 6 horror/thriller movies(The Substance, Nosferatu, Frankenstein, 28 years later, Sinners, The Conjuring 4) 
+The Goal of this assignment is to use a Global Baseline Estimate (GBE) recommendation system using R and see how personalized changes result in predictions. With the movie rating data collected in the previous assignment (Assignment_2A_Movie ratings), I aim to predict rating values for movies that reviewers have not yet seen. This is possible with the GBE formula. The data set has missing values (NA/NULL) and these will be the target for our prediction algorithm. This model will account for reviewers movie bias preferences and popularity towards the item bias. 
 
-Source: Dataset from local PostgreSQL populated via Assigment2A_movie_rating.sql
+Data set contains ratings of 6 reviewers (Liz, Jed, Brenda, Jamie, Justice, Theresa) and 6 horror/thriller movies(The Substance, Nosferatu, Frankenstein, 28 years later, Sinners, The Conjuring 4). I am going to calculate Jamies predicted rating for 28 Years Later as that was a movie she have not seen.
 
+**Calculation will be done for all variables listed in this formula:**
 
-# Implementation Steps 
+**predicted_ratings = global average + item bias + user bias**
+
+$$\hat{r}_{ui} = \mu + b_i + b_u$$\
+
+Source: Data set from local PostgreSQL populated via Assignment2A_movie_rating.sql, Gemini Pro for information and definition of each part of Global Baseline Estimate formula, and R for data Science book 2e. for tidyverse arguments/functions
+
+# [Implementation Steps]{.underline}
 
 (1) Connecting/Loading Data
 
-        PostgreSQL database connection with DBI and RPostgres, import raw ratings table into R data frame, and convert NULL 
-        values in SQL into NA values in R for calculation
+    PostgreSQL database connection with DBI and RPostgres, import raw ratings table into R data frame, and convert NULL values in SQL into NA values in R for calculation
 
-(2) Bias Calculation and apply GBE forumla
-     With dyplyr, use Group_by function and calculate: 
-      - Mean of all rating 
-      - Group: title --> movies bias
-      - Group: reviewer_name --> User bias 
-    GBE formula for User+movie pair 
+(2) Bias Calculation and apply GBE formula With dyplyr, use Group_by function and calculate:
+
+    -   Mean of all rating
+    -   Group: title --\> movies bias
+    -   Group: reviewer_name --\> User bias GBE formula for User+movie pair
+
 (3) Comparison and Data Visualization
 
-       Raw average vs GBE average predictions and seeing the user bias distribution. Find the predicted score for a reviewer, in this       case,   I will use Liz as an example. 
+    Raw average vs GBE average predictions and seeing the user bias distribution. Find the 28 Years Later predicted score for a reviewer Jamie
+
+Challenges: Reproducibility of database, finding correct function to create formula and finding out what Jamie would rate 28 Years Later (NA)
+
+## [Code Base]{.underline}
 
 ```{r}
+# Load essential packages to use for data manipulation
+
+
+library(DBI)
+library(RPostgres)
+library(tidyverse)
+
+# Previously, database creation and password was prompted for users opening file. I decided to make reproducibility easier this time by converting the SQL query table into a csv file 
+
+df <- read.csv("movie_ratings.csv", )
+
+# Confirm if table pops up
+
+print(df)
+```
+
+## Calculate Global Average - all 16 ratings
+
+```{r}
+global_mu <- mean(df$rating)
+print(paste("Global_Average (Mu):", round(global_mu, 4)))
 
 ```
 
+## Calculate Movie Bias for "28 Years Later": Average rating of "28 Years Later" - Global Average
+
+```{r}
+movie_avg <- df %>%
+  filter(title == "28 Years Later") %>%  #single out just that particular movie
+  summarize(mean_rating = mean(rating, na.rm = TRUE)) %>% #calculate mean
+  pull(mean_rating) ##change to vector from column
+
+
+b_i <- movie_avg - global_mu
+```
+
+## Calculate User Bias for "Jamie" (Average rating of Jamie - Global Average)
+
+```{r}
+user_avg <- df %>%
+  filter(name == "Jamie") %>% #single out Jamie from list
+  summarize(mean_rating = mean(rating, na.rm = TRUE)) %>% # mean calculation
+  pull(mean_rating) #change to vector from column
+
+b_u <- user_avg - global_mu
+
+```
+
+## Calculate the Prediction = Global Average + Movie Bias + User Bias
+
+```{r}
+prediction <- global_mu + b_i + b_u
+```
+
+## Print the Results
+
+```{r}
+
+print(paste("Global Average:", round(global_mu, 4)))  #round and keeps at 4th decimal place
+print(paste("Movie Bias (28 Years Later):", round(b_i, 4)))
+print(paste("User Bias (Jamie):", round(b_u, 4)))
+print(paste("FINAL JAMIE'S PREDICTION:", round(prediction, 4)))
+```
+
+## Conclusion
+
+Global Average was **4.31**, taken for all 16 reviewers ratings. The reviewers in this group are generous with their ratings or the horror/thriller movies selected were very interesting. Due to the baseline being so high, movies under the rating of 4.31 would be under average even if 4.0 is a good score taken into account the ratings received from this data set.
+
+Item bias: 28 Years later = **4.0 Average** and has a negative bias of **- 0.31**. This movie is weaker compare to others in this specific data set
+
+User bias: Jamie's average rating = **4.5**, she has a positive bias of **+0.19**, this shows the Jamie is little more generous reviewer compare to the average in this group
+
+Global Estimate Baseline formula system predicts that Jamie would rate ***28 Years later*** a **4.19**. 
+This predicted score suggests that Jamie would likely enjoy 28 Years Later and the system would recommend this movie to her. Based on the formula, I see that this provides a personalized predictions based on corrections taken from the data set ratings into account instead of just relying on the raw movie averages. 
