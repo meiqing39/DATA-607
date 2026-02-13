@@ -1,0 +1,33 @@
+---
+title: "Assignment_3B Window Functions"
+author: "Mei Qi Ng"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## **Approach**
+
+In this assignment, I am using the data set of Coco-Cola (KO) and PepsiCo(PEP) price trends since January 1, 2022. I find this data set interesting as they are both each others main competitors. I will be using the dpylr and zoo R packages to better understand how to use window function for time series for 2 or more separate items , which is a variation of an aggregation function to THE 2 types of window function that will be required for this analysis will be a rolling window for the 6 day moving average and an expanding window for the Year to Data (YTD) average.
+
+![](CVSP.png){width="400"}
+
+## **Process proposal steps:**
+
+(1) **Data Preparation and Sorting:** First, i will sort the data by Ticker and Date which ensure calculations will follow the correct chronological order so that there is no blunder to accurate time-series analysis
+
+(2) **Rolling Window --\> 6 Days Moving Average:** I will group by Ticket only, use rollmean() from zoo package, k=6 for window size, align = "right", and setting any incomplete parts with NA (fill = NA) using values from date and the first 5 days is used for the average.
+
+```{r}
+
+```
+
+(3) **Expanding Window --\> YTD Average:**\
+    Group by Ticker and Year, use cummean () - cumulative mean in dyplr package to calculate YTD average.
+
+```{r}
+
+```
