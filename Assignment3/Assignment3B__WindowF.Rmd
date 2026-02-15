@@ -21,13 +21,76 @@ In this assignment, I am using the data set of Coco-Cola (KO) and PepsiCo(PEP) p
 
 (2) **Rolling Window --\> 6 Days Moving Average:** I will group by Ticket only, use rollmean() from zoo package, k=6 for window size, align = "right", and setting any incomplete parts with NA (fill = NA) using values from date and the first 5 days is used for the average.
 
-```{r}
-
-```
-
 (3) **Expanding Window --\> YTD Average:**\
     Group by Ticker and Year, use cummean () - cumulative mean in dyplr package to calculate YTD average.
 
+Source: 
+  (1) Gemini Pro 
+  (2) R for Data Science 2e
+  (3)https://dplyr.tidyverse.org/articles/window-functions.html
+  (4)https://www.r-bloggers.com/2017/07/tidy-time-series-analysis-part-2-rolling-functions/
+  
+
 ```{r}
 
+library (tidyverse)
+library(zoo)
 ```
+
+# Data set generated
+
+I am interested in the two time series values of Coca Cola vs Pepsi stocks and want to see how they compare to each other price wise overtime in terms of 6 days and YTD overall. I had Gemini Pro LLM generate the data set representing the daily closing prices for Coca-Cola and PepsiCo starting January 2022
+
+```{r}
+#Dataset genereate by LLM for Coco-Cola and PepsiCo
+
+stock_data <- data.frame(
+  Date = as.Date(c(
+    # Coca-Cola (KO) - Jan 2022
+    "2022-01-03", "2022-01-04", "2022-01-05", "2022-01-06", 
+    "2022-01-07", "2022-01-10", "2022-01-11",
+    # PepsiCo (PEP) - Jan 2022
+    "2022-01-03", "2022-01-04", "2022-01-05", "2022-01-06", 
+    "2022-01-07", "2022-01-10", "2022-01-11"
+  )),
+  Ticker = c(rep("KO", 7), rep("PEP", 7)),
+  Price = c(
+    59.0, 59.5, 60.0, 59.8, 60.2, 60.5, 60.1,  # KO Prices
+    173.0, 174.5, 175.0, 174.0, 175.5, 176.0, 175.2 # PEP Prices
+  )
+)
+
+print(stock_data)
+```
+
+# Window functions to calculate required average
+
+Using information found on the dplyr.tidyverse and R-blogger website, I combine that with other previously used function to manipulate the data set table. 
+
+#-------------------------------------------------------------
+# 1. Calculate 6 Day Moving Average
+```{r}
+calculated_data <- stock_data |> 
+  group_by(Ticker) |>  #group only by ticker so it slides 
+  mutate(Moving_Avg_6D = rollmean(Price, k = 6, fill= NA, align = "right"))  # window function (rollmean() for looking at the current 5 row preceding metrics)
+
+print(calculated_data)
+```
+#-----------------------------------------------------------------
+# 2. Year to Date Average 
+```{r}
+calculated_YTD_data <- stock_data |> 
+mutate(Year = year(Date)) |> # Create a Year column
+  group_by(Ticker, Year) |>   #Group by Ticker and Year to annual reset
+  mutate(YTD_avg = cummean(Price)) # Window Function (cummean()) to gather average from Jan 1st
+
+print(calculated_YTD_data)  #view completed result
+
+
+```
+# Conclusion
+This assignment I used the LLM generated KO and PEP stock result to demonstrate how to apply window functions to analyze time-series financial data. I was able to track the daily closing price of both stock since January 1,2022 and run both rolling and expanding window calculation with dplyr and zoo package in R. This analysis relied on the window functions rollmean() and cummean() to satisfied this and allows me to observe the both the short-term trend and expected price of the stocks for the year which helps with seeing if the stocks are overperforming/underperforming for that year.
+
+Challenge: In-completed Data: The first few days of the data was not calculable with the 6 day moving average due to it not being the full 6 day. Hence, filling that space with fill=NA in the window function prevents R from returning partial averages and focus on calculating what we need. Another issue I found while trying data sort/organize, was trying to use solely just the year but with lubricate inside the tidyverse package, I was able to do  that and add it to group_by() to correct the calculation. Finally, a unexpected error also occurred with naming a column, initially "6_Day_Moving_Avg" but R syntax rules made it so that variable names cannot start with a number so I adjusted to a Moving_Avg_6D name column.   
+
+
