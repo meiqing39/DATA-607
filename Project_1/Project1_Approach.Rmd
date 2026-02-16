@@ -1,0 +1,27 @@
+---
+title: "Project 1"
+author: "Mei Qi Ng"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## [**Approach**]{.underline}
+
+In this project, we are given a text file with chess tournament results where information has some structure. The goal is to create an R markdown file that generates a .CSV file (that could be for example imported into a SQL database) with the following information for all players:
+
+### *Player’s Name, Player’s State, Total Number of Points, Player’s Pre-Rating, and Average Pre Chess Rating of Opponents*
+
+```{r echo=FALSE, out.width="40%", fig.align="center"}
+knitr::include_graphics("https://images.pexels.com/photos/277092/pexels-photo-277092.jpeg")
+
+```
+
+(1) Data Loading: The tournament text file will be posted on Github, which allows me to load the data frame.
+
+(2) Data Tidying: Based on looking at raw tournament txt file, I see that there are some rows of lines and other cells that will need to be cleared up , columns that are not needed for calculation, renaming columns for clarity, rearranging, and changing of characters to integers for easier workaround for this data frame.
+
+(3) Create CSV: With this newly cleaned up version of this table, a csv file will be created and used to analyze the tournament information.
