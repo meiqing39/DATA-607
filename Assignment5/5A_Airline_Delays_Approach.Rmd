@@ -1,0 +1,30 @@
+---
+title: "Assigment 5A Airline Delays "
+author: "Mei Qi Ng"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Approach
+
+In this assignment, I recreating a chart that describes the arrival delays of two airlines, Alaska and Amwest, across 5 destinations. The goal is to tidy and transform by using tidyr and dplyr functions on this wide structure data set. Once the table is in tidy format, I will perform the following analysis on the two airlines:
+
+-   Percentage of either delays/arrival rates for Alaska vs Amwest overall in a table
+
+-   Percentage of either delays/arrival rates for Alaska vs Amwest across 5 cities in a table
+
+-   Discrepancies of Alaska vs Amwest flight performances city by city and overall (Descriptions and Explanation)
+
+# Proposed Steps:
+
+(1) Data creation and loading: Chart was created on excel and converted into a .csv file before being upload on to my Github repository. After the chart is loaded on to R using the raw text file URL on Github.
+
+(2) Data Tidying and Transformation: Using tidyr and dplyr function, I plan on first creating a header name on the first row for the airline and their status, remove the blank row, then change the wide structure of this table into a longer structure to get the tidy format.
+
+(3) Comparison: Now that the table is in a long tidy format, I can proceed with data analysis by grouping the Airlines (Alaska and Amwest) then summarize to get either the delay/arrival rates of the 2 airlines' overall flight for comparison. After I want to know what is the difference between the two for each cities listed which I will be combine and grouping the Airline and cities up before using the summarize function to perform the mathematics equation to get the percentages for comparison.
+
+(4) Discrepancies: With all the percentages of overall flights for both airlines and flights for each cities, I will analyze if there are any observed inconsistencies and outliers in both airline company's' flight performances.
