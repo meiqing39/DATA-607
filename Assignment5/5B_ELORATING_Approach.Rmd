@@ -15,7 +15,7 @@ For this project, the previous data set created in Project 1 chess tournament wi
 
 Steps:
 
-1.  Data Loading: To utilize the data set used in Project 1 chess tournament tables, I source from the upload R markdown file URL in Github
+1.  Data Loading: To utilize the data set used in Project 1 chess tournament tables, I sourced from the upload R markdown file URL in Github
 
 2.  Data Manipulation: From there I will create a longer formatted table and transform it so that it is easier to work with for calculations
 
@@ -34,3 +34,4 @@ This formula will be applied to each player to get their expected score for comp
 -   R for Data Science 2e book
 
 -   [The Elo Rating System for Chess and Beyond](https://www.youtube.com/watch?v=AsYfbmp0To0)
+
