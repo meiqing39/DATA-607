@@ -1,0 +1,36 @@
+---
+title: "Assignment_5B ELO Calculations"
+author: "Mei Qi Ng"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## **Approach**
+
+For this project, the previous data set created in Project 1 chess tournament will be used to calculate the expected scores and the difference of their expected scores to their actual scores. After calculation to performed, the 5 players that overperformed/underperformed relatively to their expected scores can be extracted and listed.
+
+Steps:
+
+1.  Data Loading: To utilize the data set used in Project 1 chess tournament tables, I source from the upload R markdown file URL in Github
+
+2.  Data Manipulation: From there I will create a longer formatted table and transform it so that it is easier to work with for calculations
+
+3.  Elo Calculation: According to the video, The Elo Rating System for Chess and Beyond, to calculate a player's expected score, the formula is:
+
+    \$\$E_A = \\frac{1}{1 + 10\^{(R_B - R_A)/400}}\$\$
+
+***E*** is the expected score, ***R*** is the rating and ***A/B*** under is referred to as the players.
+
+This formula will be applied to each player to get their expected score for comparison of the actual expected score vs the calculated expected score and will be use to calculate the difference.
+
+4.  Extraction: 5 Over performer and 5 Under performers will be extracted from the table to create a list based on the differences.
+
+**Source:**
+
+-   R for Data Science 2e book
+
+-   [The Elo Rating System for Chess and Beyond](https://www.youtube.com/watch?v=AsYfbmp0To0)
