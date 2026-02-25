@@ -1,43 +1,11 @@
 
-## [**Approach**]{.underline}
-
-In this project, we are given a text file with chess tournament results where information has some structure. The goal is to create an R markdown file that generates a .CSV file (that could be for example imported into a SQL database) with the following information for all players:
-  
-  ### *Player’s Name, Player’s State, Total Number of Points, Player’s Pre-Rating, and Average Pre Chess Rating of Opponents*
-  
-  Starting this there was the challenge of trying to tidy this data set as there are many pipelines and spaces that are in the way as well as trying to extract information to creating columns with the correct names and their corresponding data. Using strings and regular expression often was necessary for me to properly organize the data.
-
-
-(1) Data Loading: The tournament text file will be posted on Github, which allows me to load the data frame.
-
-(2) Data Tidying: Removing headers, separating into smaller tables, cleaning tables, extracting data, combining, and creating new tables for calculation.
-
-(3) Average Opponent Calculation and Hand-calculation: Calculating at least 2 cases averages and comparing that to the averages from "Average Pre Chess Rating of Opponents"
-
-(4) Create CSV: With this newly cleaned up version of this table, a csv file will be created and used to analyze the tournament information.
-
-Challenges: Based on looking at raw tournament txt file, I see that there are some rows of lines and other cells that will need to be cleared up , columns that are not needed for calculation, renaming columns for clarity, rearranging, and changing of characters to integers for easier workaround for this data frame. Create the new table used for average calculation was also difficult so I used Gemini Pro to suggest functions that can be used to create the new columns need for calculation.
-
-# Source:
-
-(1) Gemini Pro - to troubleshoot regular expressions for extracting the opponents ratings.
-
- *AI citation -(Google DeepMind. (2026). Gemini Pro [Large language model]. <https://gemini.google.com>. Accessed February 19, 2026*
-                     
-                     (2) [Posit Stringr/Regrex cheatsheet](https://posit.co/wp-content/uploads/2022/10/strings-1.pdf)
-                   
-                   (3) R for Data Science 2e : Chapters from Week 3
-                   
-                   # Load data
-                   
                    library(tidyverse)
                    
                    raw_data <- read.csv("https://raw.githubusercontent.com/meiqing39/DATA-607/refs/heads/main/Project_1/tournamentinfo.txt")
                    
                    head(raw_data)
         
-              
-
+            
                    #remove first 2 rows of non data
                    
                    new_df <- raw_data |> 
@@ -78,8 +46,6 @@ Challenges: Based on looking at raw tournament txt file, I see that there are so
                      separate_wider_delim( cols = raw_text, 
                                            delim = "|", names = c("Player_State", "Rating_Info", NA, NA, NA, NA, NA, NA, NA, NA, NA)) 
                    # fill in empty columns with NA to run this function
-
-                   
 
                    # CLEAN AND EXTRACT TARGET DATA
                    
@@ -145,3 +111,4 @@ Challenges: Based on looking at raw tournament txt file, I see that there are so
                    write.csv(final_project_data, "project1_chess_results.csv", row.names = FALSE)
 
                   
+
