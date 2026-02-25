@@ -1,5 +1,4 @@
-
-                   library(tidyverse)
+                  library(tidyverse)
                    
                    raw_data <- read.csv("https://raw.githubusercontent.com/meiqing39/DATA-607/refs/heads/main/Project_1/tournamentinfo.txt")
                    
@@ -111,4 +110,5 @@
                    write.csv(final_project_data, "project1_chess_results.csv", row.names = FALSE)
 
                   
+
 
