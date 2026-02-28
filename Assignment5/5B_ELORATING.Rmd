@@ -1,0 +1,102 @@
+---
+title: "Assignment_5B ELO Calculations"
+author: "Mei Qi Ng"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## **Approach**
+
+For this project, the previous data set created in Project 1 chess tournament will be used to calculate the expected scores and the difference of their expected scores to their actual scores. After calculation to performed, the 5 players that overperformed/underperformed relatively to their expected scores can be extracted and listed.
+
+Steps:
+
+1.  Data Loading: To utilize the data set used in Project 1 chess tournament tables, I sourced from the uploaded R script file URL in Github
+
+2.  Data Manipulation: From there I will create a longer formatted table and transform it so that it is easier to work with for calculations
+
+3.  Elo Calculation: According to the video, The Elo Rating System for Chess and Beyond, to calculate a player's expected score, the formula is:
+
+    \$\$E_A = \\frac{1}{1 + 10\^{(R_B - R_A)/400}}\$\$
+
+***E*** is the expected score, ***R*** is the rating and ***A/B*** under is referred to as the players.
+
+This formula will be applied to each player to get their expected score for comparison of the actual expected score vs the calculated expected score and will be use to calculate the difference.
+
+4.  Extraction: 5 Over performer and 5 Under performers will be extracted from the table to create a list based on the differences.
+
+**Source:**
+
+-   [R for Data Science (2e)](https://r4ds.hadley.nz/)
+
+-   [The Elo Rating System for Chess and Beyond](https://www.youtube.com/watch?v=AsYfbmp0To0)
+
+-   [Wikipedia Elo rating system](https://en.wikipedia.org/wiki/Elo_rating_system)
+
+# **Execution Code Base**
+
+# **Data loading**
+
+```{r}
+source("https://raw.githubusercontent.com/meiqing39/DATA-607/refs/heads/main/Project_1/Project1_Chess_codebase.R")
+
+```
+
+# **Data Manipulation**
+
+```{r}
+head(combined_data)
+```
+
+# Da**ta Manipulation**
+
+```{r}
+newchess_df <-combined_data |> 
+  select(Player_Num, Total_Points, Pre_Rating, R1:R7) |> 
+  pivot_longer(R1:R7, names_to = "Rounds", values_to = "Match_Result") |>  #create long table for all the rounds played
+  mutate(Opponent_Number = as.numeric(str_extract(Match_Result, "\\d+")))      #extract from Match_Result table to Opponent#
+
+head(newchess_df)                  #Check for both tables to check variables and column names
+
+head(ratings_lookup)
+```
+
+# **ELO Calculation**
+
+```{r}
+#Join old table with new ratings look up table 
+newchess_df1 <- newchess_df|> left_join(ratings_lookup, by = c("Opponent_Number" = "Player_Num")) |>  
+  rename(Opponent_Rating = Pre_Rating.y)          
+
+#Calcuate expected elo score of each player then add everything up for all rounds for each player to get Total expected
+ELO_Cal <-newchess_df1 |> 
+  mutate(Expected_score = 1/(1+10^((Opponent_Rating - Pre_Rating.x)/400))) |> 
+  group_by(Player_Num, Total_Points) |> 
+  summarise(Expected_total_score = sum(Expected_score), .groups = "drop") |> 
+  mutate(Score_Difference = Total_Points - Expected_total_score)  #Subtract the Total expected score of players with their actual total score 
+```
+
+# **Extract the Top 5s**
+
+```{r}
+Overperformers_5 <- ELO_Cal |>                
+  arrange(desc(Score_Difference)) |>  #Arranging by descending order for Top 5 Overperformers
+  head(5)
+
+Underperformers_5 <- ELO_Cal |> 
+  arrange(Score_Difference) |>  #Arranging by ascending order for Top 5 Underperformers
+  head(5)
+
+print(Overperformers_5)
+print(Underperformers_5)
+```
+
+# **Conclusion**
+
+The initial challenge was to tidy and transform a unstructured and messy formatted chess tournament text file where string manipulation, tidyr, and regular expression functions were used to create a clean and tidy data set that can be used for SQL relational database integration. After this data set was used in this project to evaluate the player's ratings using the Arpad Elo rating formula. As this data set was very wide, it was necessary to transform the data table into a long format in order to record the match history and used the numbers for expected win probability calculation for every round for each player. The expected scores is then compared with the actual tournament points to identify the top 5 overperformers and underperformers.
+
+Due to the reproducibility of this R codebase after cleaning the data set, I was able to quickly generate metrics that can be used for rating analysis and mathematic calculations.
