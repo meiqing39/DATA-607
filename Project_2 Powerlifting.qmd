@@ -1,0 +1,26 @@
+---
+title: "Project_2_Powerlifting mess"
+author: "Mei Qi Ng"
+format: html
+editor: visual
+---
+
+## Approach
+
+One of the 3 dataset used for this project comes from the Open Powerlifting Database on Kaggle, which contains detailed competition results across federations, weight classes, and events. Although the dataset is readable but it is not stored in tidy format and the structure issues makes it untidy.It is in a wide format storage, with many hidden variables embedded in the column names and has many observation in 1 row which shows the athletes entire performances. By addressing these structural issues by reshaping this dataset before analysis can be performed.
+
+Source: [Kaggle Powerlifting Database](https://www.kaggle.com/datasets/open-powerlifting/powerlifting-database)
+
+## Proposal Strategy:
+
+(1) Data Importing and Preparation I plan on importing the csv from my Github Repositiory in this qmd file. After I will identify the wide format columns and reshape them from wide to long format using only 2 columns with new variable names. Once organized, I will extract variables in the columns such as lift types (Squat, Bench, Deadlift) and Attempt times and rename for consistency. Any missing values will be handled as some competitors may not have attempted all lifts.
+
+(2) Analysis I am interested in the following analyses in this cleaned up dataset:
+
+    -   Difference in power lifting performance across sex
+
+    -   Lift strength relative to body weight
+
+    -   Max recorded lifts
+
+ggplot2 function will be used to create data visualization containing title, legend, axises and results will be summarized in tables with clear labeling
