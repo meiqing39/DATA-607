@@ -1,0 +1,27 @@
+[
+  {
+      "title": "Girlhood",
+      "authors": "Melissa Febos",
+      "publication_year": 2021,
+      "publisher": "Bloomsbury",
+      "genre": "Memoir / Essays"
+
+  },
+  {
+      "title": "The High 5 Habit",
+      "authors": "Mel Robbins",
+      "publication_year": 2021,
+      "publisher": "Hay House",
+      "genre": "Self-Help"
+
+  },
+  {
+    
+      "title": "Burnout: The Secret to Unlocking the Stress Cycle",
+      "authors": "Emily Nagoski; Amelia Nagoski",
+      "publication_year": 2019,
+      "publisher": "Ballantine Books",
+      "genre": "Health / Psychology"
+
+  }
+]
