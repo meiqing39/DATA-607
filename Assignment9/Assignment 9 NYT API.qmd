@@ -1,0 +1,88 @@
+---
+title: "Assignment NYTAPI Approach"
+author: "Mei Qi Ng"
+format: pdf
+editor: visual
+toc: true
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## Approach
+
+For this data acquisition assignment, my task will be to work with New York Times Books API, using the `/lists/current/hardcover-fiction.json` endpoint. This API shows the current top bestseller for hardcover fiction, along with other information such as author, publisher, and the number of weeks the book has been on the list
+
+Question that I will attempt to answer using data analysis:
+
+**What are the characteristics of the current top-ranking hardcover fiction books, and which publishers dominate the list currently?**
+
+## Planned Approach steps
+
+1.  **Secure Setup:** I will obtain an API key from the NYT Developer Network. To avoid hard coding in my script, I will store the key locally in an `.Renviron` file and retrieve it using `Sys.getenv()`as the environmental variable.This way this file will be reproducible and the system will look for local .Renviron file  of the users and their "NYT_API_KEY" from the New York Times Developer website. 
+
+2.  **Client-Server Communication (The Request):** Rather than scraping unstructured HTML directly from the New York Times website, I will interact with the NYT server with the `httr` package. This allows me send an HTTP `GET` request to the API endpoint (`/lists/current/hardcover-fiction.json`)which will act as the exact address on the NYT server where the current best seller data is stored. I will also use `stop_for_status()` to catch any HTTP errors (e.g., a 404 Not Found) just in case.
+
+3.  **Parsing the JSON Payload (The Response):** Once GET request completes successfully, the NYT server will return a response with the requested data formatted as JSON. JSON is the standard data format for web APIs because it organizes information into simple "key: value" pairs. I will use the `jsonlite` package and its `fromJSON()` function to translate this text file into a list that R can easily read
+
+4.  **Data Tidying:** I will extract the target data (`books` array) and changing it into tidy tibble table with the dplyr function from R tidyverse. This process involves choosing specific columns needed to answer my question.
+
+## Anticipated Data Challenges
+
+While the NYT API is well documented, I believe the few challenges that I may run into during the data transformation phase:
+
+-   **Nested Datas:** JSON files often contain lists inside of lists. One book might have a sublist of many different ISBN numbers or purchase links. When I bring this into R, these sublists can make the data frame hard to work with. I will need to select only the top level information (like the title and author) to keep my final table clean and flat.
+
+-   **Checking Data Types:** When importing data from the web, numbers are sometimes accidentally read as text. I will need to check that columns like the book's `rank` or `weeks_on_list` are formatted as numbers in R so I can sort and analyze them properly.
+
+## Source
+
+-   Extracting Data from the Web Part 1: APIs (Lecture Notes by Garrett Grolemund)
+-   Extracting Data from the Web Part 2: Web Scraping (Lecture Notes by Garrett Grolemund)
+-   R for Data Science (2e): https://r4ds.hadley.nz/
+-   New York Times Developer Network - Books API: https://developer.nytimes.com/docs/books-product/1/overview
+
+
+## Code Base
+```{r}
+# Load required package libraries
+library(httr)
+library(jsonlite)
+library(tidyverse) 
+
+# 1. Secure Setup: Key retrieve from local .Renviron file
+
+nyt_api <- Sys.getenv("NYT_API_KEY")
+
+#Endpoint URL
+url <- "https://api.nytimes.com/svc/books/v3/lists/current/hardcover-fiction.json"
+
+# 2. Client-Server Communication
+
+server_reply <- GET(url, query = list('api-key' = nyt_api))
+
+stop_for_status(server_reply) #if HTTP error, stops script 
+
+# 3. JSON Parsing
+
+json_text <- content(server_reply, "text", encoding = "UTF-8") #Extract raw text from server
+
+parsed_text <- fromJSON(json_text) #parsed raw json text into list
+
+books_raw <- as_tibble(parsed_data$results$books)
+
+# Flatten and clean the data to answer your analytical question
+tidy_books <- books_raw %>%
+  select(
+    rank,
+    title,
+    author,
+    publisher,
+    weeks_on_list
+  )
+
+# Display the final, clean table
+head(tidy_books)
+```
+
