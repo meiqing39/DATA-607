@@ -16,11 +16,15 @@ For this data acquisition assignment, my task will be to work with New York Time
 
 Question that I will attempt to answer using data analysis:
 
-**What are the characteristics of the current top-ranking hardcover fiction books, and which publishers dominate the list currently?**
+**What are the characteristics of the current top-ranking hardcover fiction books:**
+
+1.  **Which publishers dominate the list currently?**
+
+2.  **Which books has remained on the best seller list for the longest time?**
 
 ## Planned Approach steps
 
-1.  **Secure Setup:** I will obtain an API key from the NYT Developer Network. To avoid hard coding in my script, I will store the key locally in an `.Renviron` file and retrieve it using `Sys.getenv()`as the environmental variable.This way this file will be reproducible and the system will look for local .Renviron file  of the users and their "NYT_API_KEY" from the New York Times Developer website. 
+1.  **Secure Setup:** I will obtain an API key from the NYT Developer Network. To avoid hard coding in my script, I will store the key locally in an `.Renviron` file and retrieve it using `Sys.getenv()`as the environmental variable.This way this file will be reproducible and the system will look for local .Renviron file of the users and their "NYT_API_KEY" from the New York Times Developer website.
 
 2.  **Client-Server Communication (The Request):** Rather than scraping unstructured HTML directly from the New York Times website, I will interact with the NYT server with the `httr` package. This allows me send an HTTP `GET` request to the API endpoint (`/lists/current/hardcover-fiction.json`)which will act as the exact address on the NYT server where the current best seller data is stored. I will also use `stop_for_status()` to catch any HTTP errors (e.g., a 404 Not Found) just in case.
 
@@ -32,20 +36,20 @@ Question that I will attempt to answer using data analysis:
 
 While the NYT API is well documented, I believe the few challenges that I may run into during the data transformation phase:
 
--   **Nested Datas:** JSON files often contain lists inside of lists. One book might have a sublist of many different ISBN numbers or purchase links. When I bring this into R, these sublists can make the data frame hard to work with. I will need to select only the top level information (like the title and author) to keep my final table clean and flat.
+-   **Nested Data:** JSON files often contain lists inside of lists. One book might have a sublist of many different ISBN numbers or purchase links. When I bring this into R, these sublists can make the data frame hard to work with. I will need to select only the top level information (like the title and author) to keep my final table clean and flat.
 
 -   **Checking Data Types:** When importing data from the web, numbers are sometimes accidentally read as text. I will need to check that columns like the book's `rank` or `weeks_on_list` are formatted as numbers in R so I can sort and analyze them properly.
 
 ## Source
 
--   Extracting Data from the Web Part 1: APIs (Lecture Notes by Garrett Grolemund)
--   Extracting Data from the Web Part 2: Web Scraping (Lecture Notes by Garrett Grolemund)
+-   Extracting Data from the Web Part 1: APIs (Lecture Notes by Garrett Grolemund): https://rstudio.com/resources/webinars/part-1-easy-ways-to-collect-different-types-of-data-from-the-web-with-r/
+-   Extracting Data from the Web Part 2: Web Scraping (Lecture Notes by Garrett Grolemund): https://rstudio.com/resources/webinars/part-2-easy-ways-to-collect-different-types-of-data-from-the-web-with-r/
 -   R for Data Science (2e): https://r4ds.hadley.nz/
 -   New York Times Developer Network - Books API: https://developer.nytimes.com/docs/books-product/1/overview
 
-
 ## Code Base
-```{r}
+
+```{r, message = FALSE}
 # Load required package libraries
 library(httr)
 library(jsonlite)
@@ -70,10 +74,10 @@ json_text <- content(server_reply, "text", encoding = "UTF-8") #Extract raw text
 
 parsed_text <- fromJSON(json_text) #parsed raw json text into list
 
-books_raw <- as_tibble(parsed_data$results$books)
+books_raw <- as_tibble(parsed_text$results$books)
 
-# Flatten and clean the data to answer your analytical question
-tidy_books <- books_raw %>%
+# Flatten table and selecting only columns with relevant characteristics  to answer questions
+top_books <- books_raw %>%
   select(
     rank,
     title,
@@ -82,7 +86,28 @@ tidy_books <- books_raw %>%
     weeks_on_list
   )
 
-# Display the final, clean table
-head(tidy_books)
+# Display clean tibble table to check
+head(top_books)
 ```
 
+**1. Which publisher dominates the list currently?**
+
+```{r}
+publisher_top <- top_books |> 
+  count(publisher, sort = TRUE) |> 
+  rename(books_on_bestsell_list = n)
+
+print(publisher_top)
+```
+
+**2. Which books has remained on the best seller list for the longest time?**
+
+```{r}
+longest_best_sellers <- top_books |> 
+  arrange(desc(weeks_on_list)) |> 
+  print()
+```
+
+## Conclusion
+
+Based on the data pulled from the New York Times Developer Network API, I gathered and analyzed the characteristics of the current hardcover fiction bestseller. By grouping the data by publisher, the analysis shows that **Ace** currently tops the hardcover fiction list with 4 books in the top 15, followed by **Del Rey** with 2 books on the top 15 list. In addition, I analyzed the weeks_on_list column in the best seller list, the data shows that **ALCHEMISED** by **SenLinYu** has remained on the best seller list longer than any other current top 15 book, even if it is ranked 12, with a total of **26** weeks on the list.
