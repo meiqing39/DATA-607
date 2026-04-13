@@ -1,0 +1,37 @@
+---
+title: "Assignment 10B Nobel Prize API JSON Practice"
+author: "Mei Qi Ng & Samantha Barbaro"
+format: html
+toc: true
+toc-depth: 2
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+## Approach
+
+The Nobel Prize organization provides public APIs for accessing structured Nobel Prize data.
+
+In this assignment, we will be using the Nobel Prize **API v2.1** to retrieve JSON data format which includes information on the laureates, categories, award years, and birthplaces etc.
+
+The data-driven questions we are investigating for this analysis are:
+
+**1. Which Nobel Prize categories have the highest number of shared prizes (more than one laureate) vs which has the highest number of solo winners?**
+
+**2. Which countries have the most Nobel laureates by birth ?**
+
+**3. How has the number of Nobel Prizes awarded changed over time?**
+
+**4. Which Nobel laureates received multiple Nobel Prizes, and in which categories?**
+
+The data retrieved from the public API endpoints from Nobel Prize developer website will be transformed into tidy data frames for analysis (cleaned, joined, filtered, and compared) to answer the 4 questions by exploring the trends, patterns, and characteristics of the Nobel prize awards using R.
+
+## Sources
+
+-   Nobel Prize Outreach. (2026). *Nobel Prize Developer Zone – API Version 2.1*.\
+    https://www.nobelprize.org/about/developer-zone-2/
+
+-   Nobel Prize Outreach. (2026). *Nobel Prize API Documentation (v2.1)*.\
+    https://api.nobelprize.org/2.1/
