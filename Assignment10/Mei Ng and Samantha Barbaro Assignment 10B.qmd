@@ -35,3 +35,58 @@ The data retrieved from the public API endpoints from Nobel Prize developer webs
 
 -   Nobel Prize Outreach. (2026). *Nobel Prize API Documentation (v2.1)*.\
     https://api.nobelprize.org/2.1/
+
+## Set up
+```{r}
+library(jsonlite)
+library(tidyverse)
+library(httr)
+
+
+#Retrieve laureates JSON from API on Nobel Prize developer zone API
+
+url_l <- "https://api.nobelprize.org/2.1/laureates"
+
+response <- GET(url_l)
+json_l <- content(response, as = "text", encoding = "UTF-8")
+
+data_l <- fromJSON(json_l, flatten = TRUE)
+
+laureates <- as_tibble(data_l$laureates)
+
+
+#Retrieve Nobel Prize JSON from API on Nobel Prize developer zone API
+
+prize_url <- "https://api.nobelprize.org/2.1/nobelPrizes"
+
+response <- GET(prize_url)
+prize_json <- content(response, as = "text", encoding = "UTF-8")
+
+prize_data <- fromJSON(prize_json, flatten = TRUE)
+
+n_prizes <- as_tibble(prize_data$nobelPrizes)
+
+
+```
+
+
+
+### Question 1: Which Nobel Prize categories have the highest number of shared prizes (more than one laureate) vs which has the highest number of solo winners?
+
+```{r}
+ shared_prizes <- n_prizes %>%
+  unnest(nobelPrizes.laureates) %>%
+  group_by(awardYear, category.en) %>%
+  summarise(num_laureates = n(), .groups = "drop") %>%
+  mutate(shared = num_laureates > 1)
+
+shared_prizes %>%
+  group_by(category.en) %>%
+  summarise(
+    total_prizes = n(),
+    shared_prizes = sum(shared),
+    share_rate = shared_prizes / total_prizes
+  ) %>%
+  arrange(desc(share_rate))
+
+```
