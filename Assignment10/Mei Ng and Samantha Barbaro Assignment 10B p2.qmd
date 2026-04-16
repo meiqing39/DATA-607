@@ -45,14 +45,14 @@ library(httr)
 
 #Retrieve laureates JSON from API on Nobel Prize developer zone API
 
-url_l <- "https://api.nobelprize.org/2.1/laureates?limit=1000"
+url_l <- "https://api.nobelprize.org/2.1/laureates?limit=1000"  #add limit parameter for more data to find more reliable results
 
 response <- GET(url_l)
 json_l <- content(response, as = "text", encoding = "UTF-8")
 
 data_l <- fromJSON(json_l, flatten = TRUE)
 
-laureates <- as_tibble(data_l$laureates)
+laureates_1<- as_tibble(data_l$laureates)
 
 
 #Retrieve Nobel Prize JSON from API on Nobel Prize developer zone API
@@ -61,14 +61,11 @@ prize_url <- "https://api.nobelprize.org/2.1/nobelPrizes?limit=1000"
 
 response <- GET(prize_url)
 prize_json <- content(response, as = "text", encoding = "UTF-8")
-
 prize_data <- fromJSON(prize_json, flatten = TRUE)
-
 n_prizes <- as_tibble(prize_data$nobelPrizes)
 
 
 ```
-
 
 ### Question 1: Which Nobel Prize categories have the highest number of shared prizes (more than one laureate) vs which has the highest number of solo winners?
 
@@ -103,7 +100,6 @@ most_laureates <- laureates_1 |>
   arrange(desc(n))
 
 ```
-
 ## 3.How has the number of Nobel Prizes awarded changed over time?
 
 **The number of Nobel Prizes awarded each year has remained consistent overtime. Five prizes were awarded annually from 1901 through 1968. In 1969, a structural increase to six prizes occurred with the introduction of the Nobel Memorial Prize in Economic Sciences, after which the annual number of prizes has remained stable. This indicates that changes over time are driven by institutional addition rather than gradual growth.**
@@ -122,7 +118,7 @@ ggplot(changed_nbp, aes(x=awardYear, y = num_prizes))+
   geom_line()+
   geom_point(size = 2)+ 
   geom_vline(xintercept = 1969, linetype = "dashed", color = "blue")+
-  annotate("text", x = 1973, y = 5.5, label = "Nobel Prize Introduced", color = "red")+  #breakaway annotation explanation
+  annotate("text", x = 1973, y = 5.5, label = "Economic Nobel Prize Introduced", color = "red")+  #breakaway annotation explanation
   scale_x_continuous(breaks = seq(1900, 2025, by = 10))+ # format x axis (shows every 10 years)
   labs(title = "Nobel Prizes Awarded Over Time",
        x = "Award Year",
@@ -134,7 +130,7 @@ ggplot(changed_nbp, aes(x=awardYear, y = num_prizes))+
 
 ```{r}
 nbprize_laureates <- n_prizes |> 
-  unnest(laureates) |> 
+  unnest(laureates_1) |> 
   select(laureatd_id = id,
          awardYear,
          category.en)
