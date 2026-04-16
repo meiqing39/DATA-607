@@ -67,7 +67,7 @@ n_prizes <- as_tibble(prize_data$nobelPrizes)
 
 ```
 
-### Question 1: Which Nobel Prize categories have the highest number of shared prizes (more than one laureate) vs which has the highest number of solo winners?
+## Question 1: Which Nobel Prize categories have the highest number of shared prizes (more than one laureate) vs which has the highest number of solo winners?
 
 **The number of shared prizes was found by counting the number of laureates associated with each Nobel Prize. For prizes with more than 1 laureate, it was classified as shared while single laureate were known as solo. The classification was summarized using Nobel prize category to find out which was most frequently awarded shared solo prizes.Based on the table below, Economic Sciences has the highest number and proportion of shared prizes, 57 out of 57 prizes were shared but if we look at just numbers, then Physics has the highest number of shared prizes (119) total. As for the highest number of solo awards, that would be Peace category (19).**
 ```{r}
@@ -88,7 +88,7 @@ shared_prizes |>
 
 ```
 
-### 2. Which countries have the most Nobel laureates by birth ?
+## Question 2: Which countries have the most Nobel laureates by birth ?
 
 **To identify which countries have the most Nobel laureates by birth, the laureates data set was group by country of birth and number of laureates from each country was counted. The United states has the highest number of Nobel laureates by birth, followed by United kingdom, Germany, and France. From this result, we can see that these countries have historically been major centers for scientific, literacy, and political contributions recognized by the Nobel Prizes.**
 ```{r}
@@ -100,7 +100,7 @@ most_laureates <- laureates_1 |>
   arrange(desc(n))
 
 ```
-## 3.How has the number of Nobel Prizes awarded changed over time?
+## Question 3: How has the number of Nobel Prizes awarded changed over time?
 
 **The number of Nobel Prizes awarded each year has remained consistent overtime. Five prizes were awarded annually from 1901 through 1968. In 1969, a structural increase to six prizes occurred with the introduction of the Nobel Memorial Prize in Economic Sciences, after which the annual number of prizes has remained stable. This indicates that changes over time are driven by institutional addition rather than gradual growth.**
 
@@ -125,7 +125,7 @@ ggplot(changed_nbp, aes(x=awardYear, y = num_prizes))+
        y = "Annual Prizes Awarded")
 
 ```
-### 4. Which Nobel laureates received multiple Nobel Prizes, and in which categories? 
+## Question 4: Which Nobel laureates received multiple Nobel Prizes, and in which categories? 
 
 
 **By joining the Nobel Prize and laureate datasets, it is possible to identify individuals who received more than one Nobel Prize. Only a few laureates have won multiple awards, often across different categories, which shows the rarity of multiple Nobel recognition and impact of these individual's contributes.These laureates include Marie Curie, who won prizes in both Physics and Chemistry, and Linus Pauling, who received awards in Chemistry and Peace. Other repeat winners are John Bardeen, Frederick Sanger, and K. Barry Sharpless who all received multiple prizes within the same scientific category. **
