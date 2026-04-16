@@ -125,14 +125,53 @@ ggplot(changed_nbp, aes(x=awardYear, y = num_prizes))+
        y = "Annual Prizes Awarded")
 
 ```
-
 ### 4. Which Nobel laureates received multiple Nobel Prizes, and in which categories? 
 
-```{r}
-nbprize_laureates <- n_prizes |> 
-  unnest(laureates_1) |> 
-  select(laureatd_id = id,
-         awardYear,
-         category.en)
-```
 
+**By joining the Nobel Prize and laureate datasets, it is possible to identify individuals who received more than one Nobel Prize. Only a few laureates have won multiple awards, often across different categories, which shows the rarity of multiple Nobel recognition and impact of these individual's contributes.These laureates include Marie Curie, who won prizes in both Physics and Chemistry, and Linus Pauling, who received awards in Chemistry and Peace. Other repeat winners are John Bardeen, Frederick Sanger, and K. Barry Sharpless who all received multiple prizes within the same scientific category. **
+```{r}
+
+# create 1 row per laureate to prize combination
+
+nbprize_laureates <- n_prizes |>
+  select(awardYear, category.en, laureates) |>
+  unnest(laureates) |>
+  transmute(
+    laureate_id = id,
+    awardYear,
+    category = category.en
+  )
+
+
+glimpse(nbprize_laureates)
+
+
+#Join with laureates_1 table to get names
+
+
+laureate_prizes <- nbprize_laureates |>
+  left_join(
+    laureates_1 |>
+      transmute(
+        laureate_id = id,
+        full_name = fullName.en
+      ),
+    by = "laureate_id"
+  )
+
+
+# Find laureates with multiple prizes
+
+
+multiple_winners <- laureate_prizes |>
+  group_by(laureate_id, full_name) |>
+  drop_na(full_name) |> 
+  summarise(
+    num_prizes = n(),
+    categories = paste(unique(category), collapse = ", "),
+    .groups = "drop"
+  ) |>
+  filter(num_prizes > 1) |>
+  arrange(desc(num_prizes))
+
+```
