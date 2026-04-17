@@ -4,6 +4,7 @@ author: "Mei Qi Ng & Samantha Barbaro"
 format: html
 toc: true
 toc-depth: 2
+code-fold: true
 execute:
   echo: true
   warning: false
@@ -76,6 +77,7 @@ n_prizes <- as_tibble(prize_data$nobelPrizes)
   mutate(shared = num_laureates > 1)  #Create shared prize, for number of laureates for prize greater than 1
 
 
+
 shared_prizes |> 
   group_by(category.en) |> #group by the type of award categories
   summarise(
@@ -84,7 +86,8 @@ shared_prizes |>
     solo_prizes = sum(!shared),
     share_rate = shared_prizes / total_prizes,
     .groups = "drop") |>
-  arrange(desc(share_rate))
+  arrange(desc(share_rate)) |> 
+  print()
 
 ```
 
@@ -98,6 +101,8 @@ most_laureates <- laureates_1 |>
   group_by(birth.place.countryNow.en) |> 
   count() |> 
   arrange(desc(n))
+
+head(most_laureates)
 
 ```
 ## Question 3: How has the number of Nobel Prizes awarded changed over time?
@@ -120,7 +125,7 @@ ggplot(changed_nbp, aes(x=awardYear, y = num_prizes))+
   geom_vline(xintercept = 1969, linetype = "dashed", color = "blue")+
   annotate("text", x = 1973, y = 5.5, label = "Economic Nobel Prize Introduced", color = "red")+  #breakaway annotation explanation
   scale_x_continuous(breaks = seq(1900, 2025, by = 10))+ # format x axis (shows every 10 years)
-  labs(title = "Nobel Prizes Awarded Over Time",
+  labs(title = "Number of Nobel Prizes Awarded by Year",
        x = "Award Year",
        y = "Annual Prizes Awarded")
 
@@ -128,7 +133,7 @@ ggplot(changed_nbp, aes(x=awardYear, y = num_prizes))+
 ## Question 4: Which Nobel laureates received multiple Nobel Prizes, and in which categories? 
 
 
-**By joining the Nobel Prize and laureate datasets, it is possible to identify individuals who received more than one Nobel Prize. Only a few laureates have won multiple awards, often across different categories, which shows the rarity of multiple Nobel recognition and impact of these individual's contributes.These laureates include Marie Curie, who won prizes in both Physics and Chemistry, and Linus Pauling, who received awards in Chemistry and Peace. Other repeat winners are John Bardeen, Frederick Sanger, and K. Barry Sharpless who all received multiple prizes within the same scientific category. **
+**By joining the Nobel Prize and laureate datasets, it is possible to identify individuals who received more than one Nobel Prize. Only a few laureates have won multiple awards, often across different categories, which shows the rarity of multiple Nobel recognition and impact of these individual's contributes.These laureates include Marie Curie, who won prizes in both Physics and Chemistry, and Linus Pauling, who received awards in Chemistry and Peace. Other repeat winners are John Bardeen, Frederick Sanger, and K. Barry Sharpless who all received multiple prizes within the same scientific category. Additionally by creating a graph, we can also see that out of the winners, Marie Curie and Lunus Pauling stand out as different categorical pioneers with them earning prizes in different fields such as Physics, chemistry and Peace. From observing the timeline of the x-axis, from the first to the second award, it takes often decades before the next groundbreaking discovery.**
 ```{r}
 
 # create 1 row per laureate to prize combination
@@ -172,12 +177,28 @@ multiple_winners <- laureate_prizes |>
     .groups = "drop"
   ) |>
   filter(num_prizes > 1) |>
-  arrange(desc(num_prizes))
+  arrange(desc(num_prizes)) |> 
+  print()
+
+
+#Graph for Timeline of multiple nobel winners 
+time_line <- laureate_prizes |> 
+  group_by(laureate_id) |> 
+  mutate(total_prizes = n(), awardYear = as.numeric(awardYear)) |> 
+  filter(total_prizes >1) |> 
+  drop_na(full_name)
+  
+
+ggplot(time_line, aes(x = awardYear, y = reorder(full_name, total_prizes), color = category)) +
+  # Draw a dashed line connecting the years for each laureate
+  geom_line() + 
+  geom_point(size = 6, alpha = 0.9) +
+  labs(
+    title = "The Multiple Nobel Prize Laureates",
+    subtitle = "Tracking the years and categories of their awards",
+    x = "Year Awarded",
+    y = "",
+    color = "Nobel Category")
+
 
 ```
-
-### Conclusion
-
-Using R's tidyverse, the Nobel Prize API version 2.1 was successfully extracted, parsed, and analyzed by looking at the deeply nested JSON data within. The unstructured data was transformed into different tidy data frames, and interestingly, there were several key historical and institutional trends regarding the Nobel Prize uncovered. From the finding, scientific focused fields such as Physics and Economic Sciences shows a strong tendency toward shared prizes which makes sense with the collaboration nature of research required. The Peace prize, on the other hand, has the highest number of solo laureates. Another aspect was the geographic dominance in Nobel Prize awarded. Historically, USA, UK, Germany have produced the highest number of laureates by birth which reveals the heavily funded research institutions in Western countries. The annual Noble prizes awarded has been consistent until the introduction of Economic Sciences Prize appeared in 1969, which bump the number from 5 to 6. Last, winning a nobel prize is a incredibly difficult achievement which made multiple award winner even more of an rarity. 
-
-Access to historical dataset taken from public APIs was possible from leveraging tools like httr and jsonlite which bridged the gap of web based data checkpoint and questions with data insights.
