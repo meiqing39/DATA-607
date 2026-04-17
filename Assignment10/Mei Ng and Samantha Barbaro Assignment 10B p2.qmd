@@ -175,3 +175,9 @@ multiple_winners <- laureate_prizes |>
   arrange(desc(num_prizes))
 
 ```
+
+### Conclusion
+
+Using R's tidyverse, the Nobel Prize API version 2.1 was successfully extracted, parsed, and analyzed by looking at the deeply nested JSON data within. The unstructured data was transformed into different tidy data frames, and interestingly, there were several key historical and institutional trends regarding the Nobel Prize uncovered. From the finding, scientific focused fields such as Physics and Economic Sciences shows a strong tendency toward shared prizes which makes sense with the collaboration nature of research required. The Peace prize, on the other hand, has the highest number of solo laureates. Another aspect was the geographic dominance in Nobel Prize awarded. Historically, USA, UK, Germany have produced the highest number of laureates by birth which reveals the heavily funded research institutions in Western countries. The annual Noble prizes awarded has been consistent until the introduction of Economic Sciences Prize appeared in 1969, which bump the number from 5 to 6. Last, winning a nobel prize is a incredibly difficult achievement which made multiple award winner even more of an rarity. 
+
+Access to historical dataset taken from public APIs was possible from leveraging tools like httr and jsonlite which bridged the gap of web based data checkpoint and questions with data insights.
