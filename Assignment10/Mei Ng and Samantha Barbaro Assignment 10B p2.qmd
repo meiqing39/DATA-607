@@ -2,6 +2,7 @@
 title: "Assignment 10B Nobel Prize API JSON Practice"
 author: "Mei Qi Ng & Samantha Barbaro"
 format: html
+theme: cerulean
 toc: true
 toc-depth: 2
 code-fold: true
