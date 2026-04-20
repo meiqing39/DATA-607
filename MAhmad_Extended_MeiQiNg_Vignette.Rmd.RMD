@@ -1,0 +1,155 @@
+---
+title: "Coffe Sales Analysis (Extension)"
+author: "Originally by Muhammad Ahmad, Extended by Mei Qi Ng"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_depth: 3
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Introduction and Setup
+
+Here, the coffee sales data from acatlin SPRING2026TIDYVERSE Github repository to analyze monthly revenue trends and extending the analysis to view time of day purchasing behavior.
+
+## Source
+
+-   <https://github.com/acatlin/SPRING2026TIDYVERSE/blob/fa897f0cf982dc786042b49cd7f801081b9ca992/M.Ahmad_Coffe_sales.csv>
+
+```{r}
+library(tidyverse)
+library(tidyr)
+library(dplyr)
+library(ggplot2)
+library(naniar)
+library(rmarkdown)
+```
+
+```{r}
+url <- "https://raw.githubusercontent.com/acatlin/SPRING2026TIDYVERSE/refs/heads/main/M.Ahmad_Coffe_sales.csv"
+
+coffeeRevenue <- read_csv(url)
+
+coffeeRevenue
+```
+
+### Muhammad Ahmad Tidyverse Create
+
+```{r}
+glimpse(coffeeRevenue)
+```
+
+```{r}
+vis_miss(coffeeRevenue)
+```
+
+```{r}
+monthly <- coffeeRevenue |>
+  mutate(Date = ymd(Date),
+         month = floor_date(Date, "month")) |>
+  group_by(month) |>
+  summarise(revenue = sum(money), .groups = "drop")
+
+monthly
+```
+
+Monthly revenue time span
+
+```{r}
+ggplot(monthly, aes(x = month, y = revenue)) + 
+       geom_line(linewidth = 1.1) +
+       geom_point(size = 3) +
+  labs(
+    title = "Monthly Revenue",
+    subtitle = "March 2024 – March 2025",
+    x = "Month",
+    y = "Revenue ($)",
+    caption = "Source: your data"
+  )
+```
+
+### Mei Qi Ng Tidyverse Extension: Product and Time Analysis
+
+While the initial analysis demonstrated a macro-level view of the monthly revenue, the data can be extended using 'dply', 'tidyr', and 'ggplot2' functions t uncover more micro-informations involving th trends which generated the sales. New features are created to analyze time of day purchasing behaviors and use faceting from ggplot2 to observe each product's performances.
+
+### Setup Coffee Revenue Time table
+
+Categorizing the raw time (00:00:00) into each part of the day (Morning, Afternoon, and Night). The function "mutate()" and "case_when()" was used to create the Time categories for each part of the day.
+
+```{r}
+
+coffee_EXT<- coffeeRevenue |>
+  mutate(hour_of_day = hour(hms(Time)),  #converts time character string with hms()
+    time_of_day = case_when(
+      hour_of_day < 12 ~ "Morning",
+      hour_of_day >= 12 & hour_of_day < 17 ~ "Afternoon",
+      TRUE ~ "Evening")) |> 
+  arrange(Time)
+
+```
+
+### Which coffee is the most popular depending on the time of the day?
+
+A long data frame is not the most readable for looking at the popular drink for each time of the time, hence by using group_by to get the counts for the drinks and time of the day. After pivot_wider() function can then create a wide format summary table.
+
+```{r}
+popular <- coffee_EXT |>
+  group_by(coffee_name, time_of_day) |>
+  summarise(total_orders = n(), .groups = "drop") |> 
+  pivot_wider(
+    names_from = time_of_day, # Make table wider by creating columns from time_of_day column with valyes of total_orders column
+    values_from = total_orders) |> 
+  # Create a total column to see overall popularity
+  mutate(Total = Morning + Afternoon + Evening) |>
+  arrange(desc(Total))       #arrange based on time
+
+# Top 5 most popular displayed
+head(popular, 5)
+```
+
+### Which coffee beverages are the top earners and how do they perform across the months?
+
+```{r}
+# Overall top 4
+
+top_bev <- coffee_EXT|>
+  group_by(coffee_name) |>
+  summarise(total_earning = sum(money)) |>
+  slice_max(order_by = total_earning, n = 4)
+
+top_bev
+
+# Calculate monthly revenue for these top products
+top_monthly_earner <- coffee_EXT |>
+  filter(coffee_name %in% top_bev$coffee_name) |>  #filter out the top 4
+  mutate(month = floor_date(ymd(Date), "month")) |>    #create month column with values using lubridate function
+  group_by(coffee_name, month) |>
+  summarise(revenue = sum(money), .groups = "drop") |> 
+  print()
+
+# Plot using facet_wrap
+ggplot(top_monthly_earner, aes(x = month, y = revenue, color = coffee_name)) +
+  geom_line() +
+  geom_point() +
+  facet_wrap(~ coffee_name, scales = "free_y") + 
+  labs(
+    title = "Monthly Revenue Trends by Top Coffee Types",
+    subtitle = "Separating highest earners to view individual seasonal trends",
+    x = "Month",
+    y = "Revenue ($)")+
+  theme(axis.text.x = element_text(size = 7))
+```
+
+
+### Wrap Up
+
+**Conclusion**
+
+By building on the beginning macro level revenue analysis, this extension demonstrates the time frame remodeling and data reshaping capabilities of the tidyverse. Using lubridate and case_when(), I created a categorical time of day features from the raw timestamps seen in the csv file, and after with the function pivot_wider() from the tidyr package, I transformed the long data into a tidy and wide table that showcased purchasing behaviors of clients. 
+Furthermore, with dplyr's slice_max() combined with ggplot2's facet_wrap() allowed, I gathered the top 4 revenue-generating beverages (Latte, Americano with Milk, Cappuccino, and Americano) to observe their seasonal trends without creating a cluttered visualization on a single graph. Ultimately, this collaborative vignette was a great way to demonstrate how to take raw transaction logs, create new dimensions, and produce visualizations showing business sales results.
+
+
